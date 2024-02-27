@@ -35,7 +35,7 @@ class Home extends BaseController
         try {
             if ($this->redis->connect("127.0.0.1")) {
                 $this->redis->auth(getenv('app.redisPass'));
-                //                $this->redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_JSON);
+                // $this->redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_JSON);
             } else {
                 echo "Redis connection error, Guarsy require redis to run";
                 die();

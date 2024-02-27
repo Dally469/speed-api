@@ -152,7 +152,10 @@ class Home extends BaseController
             }
             $result['statusCode'] = 400;
             $result['status'] = false;
+            $result['otp'] = $this->referenceNumber(4);
             $result['message'] = $message;
+            $result['driver_data'] =
+            $mdl->where('id', $drive['id'])->get()->getRow();
             return $this->response->setStatusCode(400)->setJSON($result);
         }
         $diverId = $mdl->insert([
@@ -164,7 +167,7 @@ class Home extends BaseController
         $result['status'] = true;
         $result['otp'] = $this->referenceNumber(4);
         $result['message'] = "Driver Registered Successfully";
-        $result['driver_data'] = $mdl->where('id', $diverId)->get()->getResultArray();
+        $result['driver_data'] = $mdl->where('id', $diverId)->get()->getRow();
 
         return $this->response->setJSON($result);
     }
@@ -276,7 +279,7 @@ class Home extends BaseController
         $result['statusCode'] = 200;
         $result['status'] = true;
         $result['message'] = "Profile Updated Successfully";
-        $result['driver_data'] = $mdl->where('id', $driverId)->get()->getResultArray();
+        $result['driver_data'] = $mdl->where('id', $driverId)->get()->getRow();
         return $this->response->setJSON($result);
     }
     /**
@@ -382,7 +385,7 @@ class Home extends BaseController
             $result['otp'] = $otp;
             $result['message'] = "Passenger Already Registered";
             $result['client_data'] =
-                $mdl->where('id', $client['id'])->get()->getRow();;
+                $mdl->where('id', $client['id'])->get()->getRow();
             return $this->response->setStatusCode(400)->setJSON($result);
         }
 
@@ -1238,4 +1241,44 @@ class Home extends BaseController
 
         return $this->response->setJSON($result);
     }
+
+    public function getDriverInfo(): Response
+    {
+
+        $mdl = new DriverModel();
+        $requestMdl = new ClientRequestModel();
+        $locModl = new CarModel();
+        $input = json_decode(file_get_contents("php://input"));
+
+        $id =  $input->driverId;
+
+        if (empty($id) && !isset($id)) {
+            $result['statusCode'] = 400;
+            $result['status'] = false;
+            $result['message'] = "Profile not found";
+            $result['profile_data'] = [];
+            return $this->response->setStatusCode(400)->setJSON($result);
+        }
+
+        $driver = $mdl->where('id', $id)->first();
+
+        $requests = $requestMdl->select('app_client_request.*')
+        ->where("app_client_request.accepted_by", $id)
+            ->orderBy('app_client_request.id', 'DESC')
+            ->get()->getResultArray();
+
+        $vehicles = $locModl->select('app_cars.*')
+        ->where("app_cars.driver_id", $id)
+            ->get()->getRow();
+
+        $result['statusCode'] = 200;
+        $result['status'] = true;
+        $result['message'] = "Profile Updated Successfully";
+        $result['profile_data'] = $driver;
+        $result['vehicle_data'] = $vehicles;
+        $result['requests_data'] = $requests;
+
+        return $this->response->setJSON($result);
+    }
+
 }

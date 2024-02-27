@@ -43,9 +43,9 @@ $routes->get('/api/v2/get_city', 'Home::getCities');
 // WORKING ENDPOINT DRIVER
 $routes->post('/api/v2/driver/register', 'Home::registerDriver');
 $routes->post('/api/v2/driver/register_car', 'Home::registerDriverCar');
-//$routes->post('/api/v2/driver/update_info', 'Home::updateDriverInformation');
 $routes->post('/api/v2/driver/update_info', 'Home::updateDriverInformationV2');
 $routes->post('/api/v2/driver/login', 'Home::loginDriver');
+$routes->post('/api/v2/driver/profile', 'Home::getDriverInfo'); 
 $routes->post('/api/v2/driver/enable_on_map_visibility', 'Home::isDriverAvailableOnline');
 $routes->post('/api/v2/driver/accept_client_request', 'Home::acceptClientRequest');
 $routes->get('/api/v2/driver/fetch_client_request/(:any)', 'Home::getRequestFromClient/$1');
