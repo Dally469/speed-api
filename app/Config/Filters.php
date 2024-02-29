@@ -2,6 +2,7 @@
 
 namespace Config;
 
+use App\Filters\JWTAuthenticationFilter;
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\Filters\CSRF;
 use CodeIgniter\Filters\DebugToolbar;
@@ -23,6 +24,7 @@ class Filters extends BaseConfig
         'honeypot'      => Honeypot::class,
         'invalidchars'  => InvalidChars::class,
         'secureheaders' => SecureHeaders::class,
+        'auth'          => JWTAuthenticationFilter::class,
     ];
 
     /**
@@ -37,7 +39,7 @@ class Filters extends BaseConfig
             // 'csrf',
             // 'invalidchars',
         ],
-        'after' => [
+        'after'  => [
             'toolbar',
             // 'honeypot',
             // 'secureheaders',
@@ -68,5 +70,11 @@ class Filters extends BaseConfig
      *
      * @var array
      */
-    public $filters = [];
+    public $filters = [
+        'auth' => [
+            'before' => [
+                'api/v1/web/dashboard',
+            ]
+        ],
+    ];
 }

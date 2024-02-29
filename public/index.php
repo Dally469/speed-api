@@ -1,5 +1,31 @@
 <?php
 
+if (array_key_exists('HTTP_ORIGIN', $_SERVER)) {
+    $origin = $_SERVER[ 'HTTP_ORIGIN' ];
+} else if (array_key_exists('HTTP_REFERER', $_SERVER)) {
+    $origin = $_SERVER[ 'HTTP_REFERER' ];
+} else {
+    $origin = $_SERVER[ 'REMOTE_ADDR' ];
+}
+
+$allowed_domains = array(
+    'http://localhost:3000/',
+    'http://localhost:3030'
+);
+
+if (in_array($origin, $allowed_domains, true)) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+}
+
+header("Access-Control-Allow-Headers: Origin, X-API-KEY, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method, Access-Control-Allow-Headers, authorization, Authorization, observe, enctype, Content-Length, X-Csrf-Token");
+header("Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS");
+
+$method = $_SERVER[ 'REQUEST_METHOD' ];
+
+if ($method === "OPTIONS") {
+    die();
+}
+
 // Check PHP version.
 $minPhpVersion = '7.4'; // If you update this, don't forget to update `spark`.
 if (version_compare(PHP_VERSION, $minPhpVersion, '<')) {

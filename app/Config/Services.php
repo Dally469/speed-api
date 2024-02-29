@@ -29,4 +29,17 @@ class Services extends BaseService
      *     return new \CodeIgniter\Example();
      * }
      */
+
+    /**
+     * Retrieves the secret key for JWT authentication.
+     *
+     * This method returns the value of the environment variable 'JWT_SECRET_KEY'.
+     *
+     * @return string|false The value of the secret key if set, false otherwise.
+     */
+    public static function getSecretKey()
+    {
+        return getenv('JWT_SECRET_KEY');
+    }
+
 }

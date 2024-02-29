@@ -8,6 +8,8 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use CodeIgniter\Validation\Exceptions\ValidationException;
+use Config\Services;
 
 /**
  * Class BaseController
@@ -49,4 +51,66 @@ abstract class BaseController extends Controller
 
         // E.g.: $this->session = \Config\Services::session();
     }
+
+    /**
+     * Returns a response with the given response body and status code.
+     *
+     * @param array $responseBody The response data to be included in the JSON response.
+     * @param int $code The status code of the response. Default is ResponseInterface::HTTP_OK.
+     * @return ResponseInterface Returns an instance of ResponseInterface with the JSON response body and status code set.
+     */
+    public function getResponse(array $responseBody, int $code = ResponseInterface::HTTP_OK)
+    {
+        return $this->response->setStatusCode($code)->setJSON($responseBody);
+    }
+
+    /**
+     * Retrieve the input from the incoming request.
+     *
+     * @param \CodeIgniter\HTTP\IncomingRequest $request The incoming request object.
+     *
+     * @return mixed The input from the request.
+     * @throws \JsonException
+     */
+    public function getRequestInput(IncomingRequest $request)
+    {
+        $input = $request->getPost();
+        if (empty($input)) {
+            $input = json_decode($request->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        }
+        return $input;
+    }
+
+    /**
+     * Validate the given request data based on the provided rules and return the result.
+     *
+     * @param mixed $input The request data to be validated.
+     * @param array $rules The validation rules to be applied.
+     * @param array $messages Optional. Custom error messages for the validation rules. Default is an empty array.
+     * @return bool The validation result; true if the input passes the validation, false otherwise.
+     * @throws ValidationException If the provided rule is not found in the \Config\Validation.
+     */
+    public function validateRequest($input, array $rules, array $messages =[]){
+        $this->validator = Services::Validation()->setRules($rules);
+        // If you replace the $rules array with the name of the group
+        if (is_string($rules)) {
+            $validation = config('Validation');
+
+            // If the rule wasn't found in the \Config\Validation, we
+            // should throw an exception so the developer can find it.
+            if (!isset($validation->$rules)) {
+                throw ValidationException::forRuleNotFound($rules);
+            }
+
+            // If no error message is defined, use the error message in the Config\Validation file
+            if (!$messages) {
+                $errorName = $rules . '_errors';
+                $messages = $validation->$errorName ?? [];
+            }
+
+            $rules = $validation->$rules;
+        }
+        return $this->validator->setRules($rules, $messages)->run($input);
+    }
+
 }
