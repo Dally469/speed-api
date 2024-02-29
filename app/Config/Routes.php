@@ -33,6 +33,9 @@ $routes->set404Override();
  * --------------------------------------------------------------------
  */
 
+// Dashboard Endpoints
+require APPPATH . 'Config/Routes/WebRoutes.php';
+
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
@@ -55,10 +58,6 @@ $routes->post('/api/v2/driver/fetch_nearby_client_request', 'Home::getNearbyClie
 $routes->post('/api/v2/driver/fetch_cancelled_client_request', 'Home::watchCancelledClientRequest');
 $routes->post('/api/v2/driver/approve_cancellation_client_request', 'Home::approveCancellationClientRequest');
 
-
-
-
-
 // WORKING ENDPOINT CLIENT
 $routes->post('/api/v2/client/login', 'Home::clientLogin');
 $routes->post('/api/v2/client/profile', 'Home::getClientInfo'); 
@@ -77,12 +76,9 @@ $routes->get('/api/v2/client/get_online_driver_location', 'Home::getDriverLocati
 $routes->post('/api/v2/client/cancel_ride_request', 'Home::cancelRideRequest');
 $routes->post('/api/v2/client/get_client_ride_request', 'Home::getClientHistorys');
 
-
 $routes->get('/api/v2/get_daily_report/(:any)', 'Home::getDailyReport/$1');
 $routes->post('/api/v2/processing_payment', 'Home::processingPayment');
 $routes->post('/api/v2/client_send_booking_request', 'Home::clientBookingRide');
-
-
 
 $routes->add('/(:any)', 'Home::$1');
 $routes->add('/(:any)', 'Web::$1');
